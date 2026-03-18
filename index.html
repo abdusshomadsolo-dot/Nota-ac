@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nota Service AC & Toren</title>
+<meta name="theme-color" content="#0f4c75">
+<link rel="manifest" href="data:application/json,{}">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+  :root {
+    --blue-dark: #0f4c75;
+    --blue-mid: #1b6ca8;
+    --blue-light: #63b3ed;
+    --ice: #e8f4fd;
+    --white: #ffffff;
+    --gray: #6b7280;
+    --gray-light: #f3f4f6;
+    --border: #d1e8fb;
+    --green: #10b981;
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --text: #1a2332;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #e8f4fd;
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+    color: white;
+    padding: 16px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(15,76,117,0.35);
+  }
+  .app-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .app-header .subtitle {
+    font-size: 11px;
+    opacity: 0.75;
+    font-weight: 300;
+    margin-top: 1px;
+  }
+  .header-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  /* ===== NAV TABS ===== */
+  .nav-tabs {
+    background: white;
+    display: flex;
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 72px;
+    z-index: 99;
+  }
+  .nav-tab {
+    flex: 1;
+    padding: 12px 6px;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--gray);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .nav-tab .tab-icon { font-size: 18px; }
+  .nav-tab.active {
+    color: var(--blue-mid);
+    border-bottom-color: var(--blue-mid);
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 12px rgba(15,76,117,0.08);
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--blue-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon {
+    width: 28px; height: 28px;
+    background: var(--ice);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* ===== FORM ===== */
+  .form-group { margin-bottom: 12px; }
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: white;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--blue-mid);
+    box-shadow: 0 0 0 3px rgba(27,108,168,0.12);
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ===== SERVICES ===== */
+  .service-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .service-item {
+    background: var(--ice);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+  }
+  .service-item .svc-name { flex: 1; font-weight: 500; font-size: 13px; }
+  .service-item .svc-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--blue-mid);
+  }
+  .service-item .svc-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--red); font-size: 16px; padding: 2px 4px;
+    line-height: 1;
+  }
+
+  .add-service-row {
+    display: grid;
+    grid-template-columns: 1fr 110px 40px;
+    gap: 8px;
+    align-items: end;
+  }
+  .btn-add-svc {
+    width: 40px; height: 40px;
+    background: var(--blue-mid);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ===== TOTAL ===== */
+  .total-box {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    color: white;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .total-box .label { font-size: 13px; opacity: 0.85; }
+  .total-box .amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    color: white;
+    box-shadow: 0 4px 15px rgba(15,76,117,0.3);
+    margin-top: 14px;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-wa {
+    background: #25d366;
+    color: white;
+    box-shadow: 0 4px 15px rgba(37,211,102,0.3);
+    margin-top: 10px;
+  }
+  .btn-secondary {
+    background: var(--gray-light);
+    color: var(--gray);
+    margin-top: 8px;
+  }
+
+  /* ===== NOTA PREVIEW ===== */
+  #nota-preview {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(15,76,117,0.15);
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+  .nota-header {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  .nota-header .biz-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .nota-header .biz-tagline { font-size: 11px; opacity: 0.8; margin-top: 3px; }
+  .nota-header .nota-number {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11px;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .nota-body { padding: 18px; }
+  .nota-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .nota-info-item {}
+  .nota-info-label { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .nota-info-value { font-weight: 500; font-size: 13px; margin-top: 2px; }
+
+  .nota-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 0;
+  }
+  .nota-svc-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .nota-svc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 13px;
+  }
+  .nota-svc-row:last-child { border-bottom: none; }
+  .nota-svc-row .dot-fill {
+    flex: 1;
+    border-bottom: 2px dotted var(--border);
+    margin: 0 8px;
+    height: 12px;
+  }
+  .nota-total-row {
+    background: var(--ice);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .nota-total-row .tl { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+  .nota-total-row .tr {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--blue-dark);
+  }
+
+  .nota-catatan {
+    background: #fffbeb;
+    border-left: 3px solid var(--orange);
+    padding: 10px 12px;
+    border-radius: 0 8px 8px 0;
+    font-size: 12px;
+    color: #92400e;
+    margin-top: 12px;
+  }
+
+  .nota-footer {
+    background: var(--ice);
+    padding: 14px 18px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .nota-footer p { font-size: 12px; color: var(--gray); }
+  .nota-footer strong { color: var(--blue-mid); }
+
+  /* ===== HISTORY ===== */
+  .history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray);
+  }
+  .history-empty .big-icon { font-size: 48px; margin-bottom: 12px; }
+  .history-empty p { font-size: 13px; }
+
+  .history-item {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .history-item:active { transform: scale(0.98); background: var(--ice); }
+  .history-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .history-icon.ac { background: #dbeafe; }
+  .history-icon.toren { background: #d1fae5; }
+  .history-info { flex: 1; min-width: 0; }
+  .history-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .history-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .history-amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--blue-dark);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .history-date { font-size: 10px; color: var(--gray); margin-top: 2px; text-align: right; }
+
+  /* ===== LAPORAN ===== */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat-card .stat-icon { font-size: 24px; margin-bottom: 6px; }
+  .stat-card .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--blue-dark);
+    line-height: 1;
+  }
+  .stat-card .stat-label { font-size: 11px; color: var(--gray); margin-top: 4px; }
+
+  .monthly-list { display: flex; flex-direction: column; gap: 8px; }
+  .monthly-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+  }
+  .monthly-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .monthly-bar { height: 100%; background: linear-gradient(90deg, var(--blue-dark), var(--blue-light)); border-radius: 4px; transition: width 0.5s; }
+  .monthly-label { font-size: 12px; font-weight: 500; width: 40px; flex-shrink: 0; }
+  .monthly-amount { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; color: var(--blue-dark); width: 80px; text-align: right; flex-shrink: 0; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    transition: transform 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ===== SETTINGS ===== */
+  .settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-key { font-size: 12px; color: var(--gray); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .settings-val { font-size: 14px; font-weight: 500; }
+  .settings-edit-btn {
+    background: var(--ice);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--blue-mid);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+
+  /* modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
+  .modal-btns .btn { margin: 0; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--ice);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: var(--blue-mid);
+    font-weight: 600;
+  }
+
+  select option { background: white; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div>
+    <div class="app-header h1" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.3px;color:white">❄️ Service AC & Toren</div>
+    <div class="subtitle" id="header-bizname">Aplikasi Nota Digital</div>
+  </div>
+  <div class="header-icon">🧾</div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="showPage('buat')">
+    <span class="tab-icon">✏️</span>Buat Nota
+  </div>
+  <div class="nav-tab" onclick="showPage('riwayat')">
+    <span class="tab-icon">📋</span>Riwayat
+  </div>
+  <div class="nav-tab" onclick="showPage('laporan')">
+    <span class="tab-icon">📊</span>Laporan
+  </div>
+  <div class="nav-tab" onclick="showPage('pengaturan')">
+    <span class="tab-icon">⚙️</span>Pengaturan
+  </div>
+</div>
+
+<!-- ====== PAGE: BUAT NOTA ====== -->
+<div class="page active" id="page-buat">
+
+  <div class="card">
+    <div class="card-title"><span class="icon">👤</span>Data Pelanggan</div>
+    <div class="form-group">
+      <label>Nama Pelanggan</label>
+      <input type="text" id="nama" placeholder="Contoh: Pak Budi">
+    </div>
+    <div class="row2">
+      <div class="form-group">
+        <label>No. HP</label>
+        <input type="tel" id="telepon" placeholder="08xx...">
+      </div>
+      <div class="form-group">
+        <label>Tanggal</label>
+        <input type="date" id="tanggal">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Alamat</label>
+      <input type="text" id="alamat" placeholder="Jl. ...">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔧</span>Detail Layanan</div>
+
+    <div class="form-group">
+      <label>Jenis Layanan Utama</label>
+      <select id="jenis-layanan">
+        <option value="AC">❄️ Service AC</option>
+        <option value="Toren">💧 Kuras Toren</option>
+        <option value="AC+Toren">❄️💧 Service AC + Kuras Toren</option>
+      </select>
+    </div>
+
+    <div id="service-list-wrap">
+      <label style="margin-bottom:8px;display:block">Item Pekerjaan & Harga</label>
+      <div class="service-list" id="service-list"></div>
+      <div class="add-service-row">
+        <input type="text" id="svc-nama" placeholder="Nama pekerjaan/item">
+        <input type="number" id="svc-harga" placeholder="Harga" min="0">
+        <button class="btn-add-svc" onclick="addService()">+</button>
+      </div>
+    </div>
+
+    <div class="total-box" style="margin-top:14px">
+      <span class="label">Total</span>
+      <span class="amount" id="total-display">Rp 0</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📝</span>Catatan (Opsional)</div>
+    <textarea id="catatan" placeholder="Garansi 3 bulan, dll..."></textarea>
+  </div>
+
+  <button class="btn btn-primary" onclick="buatNota()">
+    🧾 Buat Nota
+  </button>
+
+  <!-- Preview Nota -->
+  <div id="nota-preview">
+    <div class="nota-header">
+      <div class="biz-name" id="pv-biz-name">SERVICE AC & TOREN</div>
+      <div class="biz-tagline" id="pv-biz-tagline">Profesional · Bergaransi · Terpercaya</div>
+      <div class="nota-number" id="pv-nota-num">NOTA #001</div>
+    </div>
+    <div class="nota-body">
+      <div class="nota-info-grid">
+        <div class="nota-info-item">
+          <div class="nota-info-label">Pelanggan</div>
+          <div class="nota-info-value" id="pv-nama">-</div>
+        </div>
+        <div class="nota-info-item">
+          <div class="nota-info-label">Tanggal</div>
+          <div class="nota-info-value" id="pv-tanggal">-</div>
+        </div>
+        <div class="nota-info-item">
+          <div class="nota-info-label">No. HP</div>
+          <div class="nota-info-value" id="pv-telepon">-</div>
+        </div>
+        <div class="nota-info-item">
+          <div class="nota-info-label">Jenis Layanan</div>
+          <div class="nota-info-value" id="pv-jenis">-</div>
+        </div>
+      </div>
+      <div class="nota-info-item" id="pv-alamat-wrap" style="margin-bottom:14px">
+        <div class="nota-info-label">Alamat</div>
+        <div class="nota-info-value" id="pv-alamat">-</div>
+      </div>
+      <div class="nota-divider"></div>
+      <div class="nota-svc-title">Rincian Pekerjaan</div>
+      <div id="pv-service-list"></div>
+      <div class="nota-total-row">
+        <span class="tl">TOTAL TAGIHAN</span>
+        <span class="tr" id="pv-total">Rp 0</span>
+      </div>
+      <div class="nota-catatan" id="pv-catatan" style="display:none"></div>
+    </div>
+    <div class="nota-footer">
+      <p>Terima kasih telah mempercayai kami! 🙏</p>
+      <p style="margin-top:4px"><strong id="pv-footer-phone"></strong></p>
+    </div>
+  </div>
+
+  <div id="nota-action-btns" style="display:none">
+    <button class="btn btn-wa" onclick="shareWA()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.557 4.126 1.533 5.862L.057 23.714c-.075.266.17.511.436.437l5.872-1.482A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.803 9.803 0 01-5.002-1.368l-.359-.213-3.722.939.969-3.678-.234-.378A9.79 9.79 0 012.182 12c0-5.418 4.4-9.818 9.818-9.818 5.419 0 9.818 4.4 9.818 9.818 0 5.419-4.399 9.818-9.818 9.818z"/></svg>
+      Share ke WhatsApp
+    </button>
+    <button class="btn btn-secondary" onclick="resetForm()">
+      ✏️ Buat Nota Baru
+    </button>
+  </div>
+
+</div>
+
+<!-- ====== PAGE: RIWAYAT ====== -->
+<div class="page" id="page-riwayat">
+  <div id="riwayat-content">
+    <div class="history-empty">
+      <div class="big-icon">📋</div>
+      <p>Belum ada nota tersimpan.<br>Buat nota pertama Anda!</p>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PAGE: LAPORAN ====== -->
+<div class="page" id="page-laporan">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">🧾</div>
+      <div class="stat-val" id="stat-total-nota">0</div>
+      <div class="stat-label">Total Nota</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-val" id="stat-total-omset" style="font-size:14px">Rp 0</div>
+      <div class="stat-label">Total Omset</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">❄️</div>
+      <div class="stat-val" id="stat-ac">0</div>
+      <div class="stat-label">Service AC</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💧</div>
+      <div class="stat-val" id="stat-toren">0</div>
+      <div class="stat-label">Kuras Toren</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">📅</span>Omset per Bulan</div>
+    <div class="monthly-list" id="monthly-chart">
+      <div style="text-align:center;color:var(--gray);padding:20px;font-size:13px">Belum ada data</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PAGE: PENGATURAN ====== -->
+<div class="page" id="page-pengaturan">
+  <div class="card">
+    <div class="card-title"><span class="icon">🏢</span>Info Usaha</div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-key">Nama Usaha</div>
+        <div class="settings-val" id="set-nama-usaha">—</div>
+      </div>
+      <button class="settings-edit-btn" onclick="editSetting('nama-usaha')">Edit</button>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-key">No. Telepon / WA</div>
+        <div class="settings-val" id="set-telepon-usaha">—</div>
+      </div>
+      <button class="settings-edit-btn" onclick="editSetting('telepon-usaha')">Edit</button>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-key">Alamat Usaha</div>
+        <div class="settings-val" id="set-alamat-usaha">—</div>
+      </div>
+      <button class="settings-edit-btn" onclick="editSetting('alamat-usaha')">Edit</button>
+    </div>
+    <div class="settings-item">
+      <div>
+        <div class="settings-key">Tagline</div>
+        <div class="settings-val" id="set-tagline">—</div>
+      </div>
+      <button class="settings-edit-btn" onclick="editSetting('tagline')">Edit</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">💡</span>Layanan Cepat</div>
+    <p style="font-size:12px;color:var(--gray);margin-bottom:12px">Tambah item layanan yang sering dipakai</p>
+    <div id="quick-services-list"></div>
+    <div class="add-service-row" style="margin-top:10px">
+      <input type="text" id="qs-nama" placeholder="Nama layanan">
+      <input type="number" id="qs-harga" placeholder="Harga">
+      <button class="btn-add-svc" onclick="addQuickService()">+</button>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:#fee2e2">
+    <div class="card-title" style="color:#dc2626"><span class="icon" style="background:#fee2e2">⚠️</span>Hapus Semua Data</div>
+    <p style="font-size:12px;color:var(--gray);margin-bottom:12px">Hapus semua riwayat nota. Tidak dapat dibatalkan!</p>
+    <button class="btn" style="background:#fee2e2;color:#dc2626" onclick="hapusSemua()">🗑️ Hapus Semua Riwayat</button>
+  </div>
+</div>
+
+<!-- Modal Edit Setting -->
+<div class="modal-overlay" id="modal-setting">
+  <div class="modal-sheet">
+    <div class="modal-title" id="modal-setting-title">Edit</div>
+    <div class="form-group">
+      <input type="text" id="modal-setting-input" placeholder="">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" style="flex:2;margin-top:0" onclick="saveSetting()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== STATE ==========
+let services = [];
+let notaCounter = parseInt(localStorage.getItem('notaCounter') || '0');
+let riwayat = JSON.parse(localStorage.getItem('riwayat') || '[]');
+let pengaturan = JSON.parse(localStorage.getItem('pengaturan') || JSON.stringify({
+  'nama-usaha': 'SERVICE AC & TOREN',
+  'telepon-usaha': '',
+  'alamat-usaha': '',
+  'tagline': 'Profesional · Bergaransi · Terpercaya'
+}));
+let quickServices = JSON.parse(localStorage.getItem('quickServices') || '[]');
+let currentEditKey = '';
+
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('tanggal').value = today();
+  loadPengaturan();
+  renderRiwayat();
+  renderLaporan();
+  renderQuickServices();
+  loadQuickServiceOptions();
+});
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatRp(n) {
+  return 'Rp ' + parseInt(n||0).toLocaleString('id-ID');
+}
+
+function formatTgl(str) {
+  if (!str) return '-';
+  const d = new Date(str);
+  return d.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+}
+
+// ========== NAVIGATION ==========
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (p === 'riwayat') renderRiwayat();
+  if (p === 'laporan') renderLaporan();
+  if (p === 'pengaturan') loadPengaturan();
+}
+
+// ========== SERVICE ITEMS ==========
+function addService() {
+  const nama = document.getElementById('svc-nama').value.trim();
+  const harga = parseInt(document.getElementById('svc-harga').value) || 0;
+  if (!nama) { showToast('Masukkan nama pekerjaan'); return; }
+  services.push({ nama, harga });
+  document.getElementById('svc-nama').value = '';
+  document.getElementById('svc-harga').value = '';
+  renderServices();
+}
+
+function removeService(i) {
+  services.splice(i, 1);
+  renderServices();
+}
+
+function renderServices() {
+  const list = document.getElementById('service-list');
+  list.innerHTML = '';
+  let total = 0;
+  services.forEach((s, i) => {
+    total += s.harga;
+    list.innerHTML += `
+      <div class="service-item">
+        <span class="svc-name">${s.nama}</span>
+        <span class="svc-price">${formatRp(s.harga)}</span>
+        <button class="svc-del" onclick="removeService(${i})">✕</button>
+      </div>`;
+  });
+  document.getElementById('total-display').textContent = formatRp(total);
+}
+
+// Quick service
+function loadQuickServiceOptions() {
+  const sel = document.getElementById('svc-nama');
+  // We'll use datalist
+  let dl = document.getElementById('svc-datalist');
+  if (!dl) {
+    dl = document.createElement('datalist');
+    dl.id = 'svc-datalist';
+    document.body.appendChild(dl);
+    document.getElementById('svc-nama').setAttribute('list', 'svc-datalist');
+  }
+  dl.innerHTML = quickServices.map(qs => `<option value="${qs.nama}" data-price="${qs.harga}">`).join('');
+  
+  document.getElementById('svc-nama').addEventListener('input', function() {
+    const found = quickServices.find(qs => qs.nama === this.value);
+    if (found) document.getElementById('svc-harga').value = found.harga;
+  });
+}
+
+// ========== BUAT NOTA ==========
+function buatNota() {
+  const nama = document.getElementById('nama').value.trim();
+  const telepon = document.getElementById('telepon').value.trim();
+  const tanggal = document.getElementById('tanggal').value;
+  const alamat = document.getElementById('alamat').value.trim();
+  const jenis = document.getElementById('jenis-layanan').value;
+  const catatan = document.getElementById('catatan').value.trim();
+
+  if (!nama) { showToast('Nama pelanggan wajib diisi!'); return; }
+  if (services.length === 0) { showToast('Tambahkan minimal 1 item pekerjaan!'); return; }
+
+  notaCounter++;
+  localStorage.setItem('notaCounter', notaCounter);
+
+  const total = services.reduce((a, b) => a + b.harga, 0);
+  const notaNum = 'INV-' + String(notaCounter).padStart(4, '0');
+  const nota = { id: notaNum, nama, telepon, tanggal, alamat, jenis, services: [...services], total, catatan, created: Date.now() };
+  
+  riwayat.unshift(nota);
+  localStorage.setItem('riwayat', JSON.stringify(riwayat));
+
+  renderPreviewNota(nota);
+  document.getElementById('nota-preview').style.display = 'block';
+  document.getElementById('nota-action-btns').style.display = 'block';
+  document.getElementById('nota-preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('✅ Nota berhasil dibuat!');
+}
+
+function renderPreviewNota(n) {
+  const biz = pengaturan['nama-usaha'] || 'SERVICE AC & TOREN';
+  document.getElementById('pv-biz-name').textContent = biz.toUpperCase();
+  document.getElementById('pv-biz-tagline').textContent = pengaturan['tagline'] || 'Profesional · Bergaransi · Terpercaya';
+  document.getElementById('pv-nota-num').textContent = 'NOTA ' + n.id;
+  document.getElementById('pv-nama').textContent = n.nama;
+  document.getElementById('pv-telepon').textContent = n.telepon || '-';
+  document.getElementById('pv-tanggal').textContent = formatTgl(n.tanggal);
+  document.getElementById('pv-jenis').textContent = n.jenis;
+  document.getElementById('pv-alamat').textContent = n.alamat || '-';
+  document.getElementById('pv-total').textContent = formatRp(n.total);
+
+  const svcList = document.getElementById('pv-service-list');
+  svcList.innerHTML = n.services.map(s => `
+    <div class="nota-svc-row">
+      <span>${s.nama}</span>
+      <span class="dot-fill"></span>
+      <span style="font-weight:600">${formatRp(s.harga)}</span>
+    </div>`).join('');
+
+  const catEl = document.getElementById('pv-catatan');
+  if (n.catatan) { catEl.textContent = '📝 ' + n.catatan; catEl.style.display = 'block'; }
+  else catEl.style.display = 'none';
+
+  document.getElementById('pv-footer-phone').textContent = pengaturan['telepon-usaha'] || '';
+  document.getElementById('header-bizname').textContent = biz;
+}
+
+function shareWA() {
+  const biz = pengaturan['nama-usaha'] || 'SERVICE AC & Toren';
+  const bizPhone = pengaturan['telepon-usaha'] || '';
+  const preview = document.getElementById('nota-preview');
+  
+  // Build text nota
+  const n = riwayat[0];
+  let msg = `🧾 *NOTA ${n.id}*\n`;
+  msg += `*${biz.toUpperCase()}*\n`;
+  if (pengaturan['tagline']) msg += `_${pengaturan['tagline']}_\n`;
+  msg += `\n`;
+  msg += `👤 *Pelanggan:* ${n.nama}\n`;
+  if (n.telepon) msg += `📱 *HP:* ${n.telepon}\n`;
+  if (n.alamat) msg += `📍 *Alamat:* ${n.alamat}\n`;
+  msg += `📅 *Tanggal:* ${formatTgl(n.tanggal)}\n`;
+  msg += `🔧 *Layanan:* ${n.jenis}\n`;
+  msg += `\n`;
+  msg += `*─── RINCIAN PEKERJAAN ───*\n`;
+  n.services.forEach(s => {
+    msg += `• ${s.nama}: ${formatRp(s.harga)}\n`;
+  });
+  msg += `\n`;
+  msg += `💰 *TOTAL: ${formatRp(n.total)}*\n`;
+  if (n.catatan) msg += `\n📝 _${n.catatan}_\n`;
+  msg += `\nTerima kasih! 🙏`;
+  if (bizPhone) msg += `\n📞 ${bizPhone}`;
+
+  const waURL = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waURL, '_blank');
+}
+
+function resetForm() {
+  document.getElementById('nama').value = '';
+  document.getElementById('telepon').value = '';
+  document.getElementById('tanggal').value = today();
+  document.getElementById('alamat').value = '';
+  document.getElementById('catatan').value = '';
+  services = [];
+  renderServices();
+  document.getElementById('nota-preview').style.display = 'none';
+  document.getElementById('nota-action-btns').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ========== RIWAYAT ==========
+function renderRiwayat() {
+  const el = document.getElementById('riwayat-content');
+  if (riwayat.length === 0) {
+    el.innerHTML = `<div class="history-empty"><div class="big-icon">📋</div><p>Belum ada nota tersimpan.<br>Buat nota pertama Anda!</p></div>`;
+    return;
+  }
+  el.innerHTML = riwayat.map((n, i) => {
+    const isAC = n.jenis.includes('AC') && !n.jenis.includes('Toren');
+    const isToren = n.jenis === 'Toren';
+    const icon = isAC ? '❄️' : isToren ? '💧' : '❄️💧';
+    const cls = isAC ? 'ac' : isToren ? 'toren' : 'ac';
+    return `<div class="history-item" onclick="lihatNota(${i})">
+      <div class="history-icon ${cls}">${icon}</div>
+      <div class="history-info">
+        <div class="history-name">${n.nama}</div>
+        <div class="history-meta">${n.id} · ${n.jenis}</div>
+      </div>
+      <div>
+        <div class="history-amount">${formatRp(n.total)}</div>
+        <div class="history-date">${formatTgl(n.tanggal)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function lihatNota(i) {
+  const n = riwayat[i];
+  showPage('buat');
+  document.querySelectorAll('.nav-tab')[0].classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,idx) => { if(idx!==0) t.classList.remove('active'); });
+  renderPreviewNota(n);
+  document.getElementById('nota-preview').style.display = 'block';
+  document.getElementById('nota-action-btns').style.display = 'block';
+  // Override share WA for history item
+  document.querySelector('.btn-wa').onclick = () => {
+    const orig = riwayat[0];
+    riwayat[0] = n;
+    shareWA();
+    riwayat[0] = orig;
+  };
+  document.getElementById('nota-preview').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ========== LAPORAN ==========
+function renderLaporan() {
+  const totalNota = riwayat.length;
+  const totalOmset = riwayat.reduce((a, n) => a + n.total, 0);
+  const totalAC = riwayat.filter(n => n.jenis.includes('AC')).length;
+  const totalToren = riwayat.filter(n => n.jenis.includes('Toren')).length;
+
+  document.getElementById('stat-total-nota').textContent = totalNota;
+  document.getElementById('stat-total-omset').textContent = formatRp(totalOmset);
+  document.getElementById('stat-ac').textContent = totalAC;
+  document.getElementById('stat-toren').textContent = totalToren;
+
+  // Monthly
+  const monthly = {};
+  riwayat.forEach(n => {
+    if (!n.tanggal) return;
+    const key = n.tanggal.slice(0, 7);
+    monthly[key] = (monthly[key] || 0) + n.total;
+  });
+
+  const months = Object.keys(monthly).sort().reverse().slice(0, 6);
+  const maxVal = Math.max(...months.map(m => monthly[m]), 1);
+  const bulanNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+
+  const el = document.getElementById('monthly-chart');
+  if (months.length === 0) {
+    el.innerHTML = `<div style="text-align:center;color:var(--gray);padding:20px;font-size:13px">Belum ada data</div>`;
+    return;
+  }
+  el.innerHTML = months.map(m => {
+    const [y, mo] = m.split('-');
+    const label = bulanNames[parseInt(mo)-1] + ' ' + y.slice(2);
+    const pct = Math.round((monthly[m] / maxVal) * 100);
+    return `<div class="monthly-row">
+      <div class="monthly-label">${label}</div>
+      <div class="monthly-bar-wrap"><div class="monthly-bar" style="width:${pct}%"></div></div>
+      <div class="monthly-amount">${formatRp(monthly[m])}</div>
+    </div>`;
+  }).join('');
+}
+
+// ========== PENGATURAN ==========
+function loadPengaturan() {
+  ['nama-usaha','telepon-usaha','alamat-usaha','tagline'].forEach(k => {
+    const el = document.getElementById('set-' + k);
+    if (el) el.textContent = pengaturan[k] || '—';
+  });
+  document.getElementById('header-bizname').textContent = pengaturan['nama-usaha'] || 'Aplikasi Nota Digital';
+}
+
+function editSetting(key) {
+  currentEditKey = key;
+  const labels = {
+    'nama-usaha': 'Nama Usaha',
+    'telepon-usaha': 'No. Telepon / WA',
+    'alamat-usaha': 'Alamat Usaha',
+    'tagline': 'Tagline'
+  };
+  document.getElementById('modal-setting-title').textContent = 'Edit ' + labels[key];
+  document.getElementById('modal-setting-input').value = pengaturan[key] || '';
+  document.getElementById('modal-setting').classList.add('open');
+  setTimeout(() => document.getElementById('modal-setting-input').focus(), 300);
+}
+
+function saveSetting() {
+  const val = document.getElementById('modal-setting-input').value.trim();
+  pengaturan[currentEditKey] = val;
+  localStorage.setItem('pengaturan', JSON.stringify(pengaturan));
+  loadPengaturan();
+  closeModal();
+  showToast('✅ Tersimpan!');
+}
+
+function closeModal() {
+  document.getElementById('modal-setting').classList.remove('open');
+}
+
+// ========== QUICK SERVICES ==========
+function addQuickService() {
+  const nama = document.getElementById('qs-nama').value.trim();
+  const harga = parseInt(document.getElementById('qs-harga').value) || 0;
+  if (!nama) { showToast('Masukkan nama layanan'); return; }
+  quickServices.push({ nama, harga });
+  localStorage.setItem('quickServices', JSON.stringify(quickServices));
+  document.getElementById('qs-nama').value = '';
+  document.getElementById('qs-harga').value = '';
+  renderQuickServices();
+  loadQuickServiceOptions();
+  showToast('✅ Layanan cepat ditambahkan!');
+}
+
+function removeQuickService(i) {
+  quickServices.splice(i, 1);
+  localStorage.setItem('quickServices', JSON.stringify(quickServices));
+  renderQuickServices();
+  loadQuickServiceOptions();
+}
+
+function renderQuickServices() {
+  const el = document.getElementById('quick-services-list');
+  if (quickServices.length === 0) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--gray);margin-bottom:10px;font-style:italic">Belum ada layanan cepat</p>';
+    return;
+  }
+  el.innerHTML = quickServices.map((qs, i) => `
+    <div class="service-item" style="margin-bottom:8px">
+      <span class="svc-name">${qs.nama}</span>
+      <span class="svc-price">${formatRp(qs.harga)}</span>
+      <button class="svc-del" onclick="removeQuickService(${i})">✕</button>
+    </div>`).join('');
+}
+
+function hapusSemua() {
+  if (!confirm('Yakin ingin menghapus semua riwayat nota? Tindakan ini tidak dapat dibatalkan.')) return;
+  riwayat = [];
+  localStorage.setItem('riwayat', '[]');
+  notaCounter = 0;
+  localStorage.setItem('notaCounter', '0');
+  renderRiwayat();
+  renderLaporan();
+  showToast('🗑️ Semua data dihapus');
+}
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Close modal on overlay click
+document.getElementById('modal-setting').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
